@@ -1,11 +1,9 @@
-![GitHub](https://img.shields.io/github/license/jorgeluis8ar/Pearl-Jam-Analysis) [![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/Pearl-Jam-Analysis/jorgeluis8ar/issues) ![](https://img.shields.io/github/followers/jorgeluis8ar?style=social)
-
-<img src="https://avatars0.githubusercontent.com/u/69487641?s=400&v=4" align="right" width=120 height=120 alt="" />
-
-### Colaboradores 
-<a href="https://github.com/jorgeluis8ar/Pearl-Jam-Analysis/graphs/contributors">
-  <img src="https://contributors-img.web.app/image?repo=jorgeluis8ar/Pearl-Jam-Analysis" />
-</a>
+---
+title: "Pearl Jam Analysis in R"
+author: "Jorge Luis Ochoa"
+date: "1/12/2021"
+output: html_document
+---
 
 
 # Pearl Jam Analysis in R
@@ -37,4 +35,30 @@ The repo is organized as follows:
 ## Intellectual Property (Copyrigths)
 
 I would like to acknowledge that every single content exposed in this repository is based on protected songs. All the rigths of the data used come from the Spotify API, Genius API, but mainly the sonwriters and composers of the songs. In no way it is intented to make it as my own. All the mistakes made are my own and no one else.
+```{r, eval=F }
+paquetes=c("spotifyr","lubridate","ggplot2",'dplyr','tidytext',
+           'stringr','tidyr','viridis','wordcloud', "tm",'forcats','fmsb',
+           'scales','radarchart','qdap')
+lapply(paquetes,require,character.only=T)
+rm(paquetes)
+```
 
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
