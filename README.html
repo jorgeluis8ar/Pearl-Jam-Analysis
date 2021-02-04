@@ -407,6 +407,44 @@ summary {
 <h2>Intellectual Property (Copyrigths)</h2>
 <p>I would like to acknowledge that every single content exposed in this repository is based on protected songs. All the rigths of the data used come from the Spotify API, Genius API, but mainly the sonwriters and composers of the songs. In no way it is intented to make it as my own. All the mistakes made are my own and no one else.</p>
 </div>
+<div id="songs-selection-spotify-api" class="section level2">
+<h2>Songs selection: Spotify API</h2>
+<p>I first asing all the packages needed into the vector <code>packages</code>. In this section the important package to query the Spotify API is <code>spotifyr</code>.</p>
+<p><code>{r, eval=T ,include=F} packages &lt;- c(&#39;spotifyr&#39;,&#39;lubridate&#39;,&#39;ggplot2&#39;,&#39;dplyr&#39;,&#39;tidytext&#39;,               &#39;stringr&#39;,&#39;tidyr&#39;,&#39;viridis&#39;,&#39;wordcloud&#39;, &quot;tm&quot;,&#39;forcats&#39;,&#39;fmsb&#39;,               &#39;scales&#39;,&#39;radarchart&#39;,&#39;qdap&#39;,&#39;knitr&#39;,&#39;geniusr&#39;,&#39;tidyverse&#39;) lapply(packages,require,character.only=T) rm(packages)</code></p>
+<p><code>{r, eval=F ,include=T} packages &lt;- c(&#39;spotifyr&#39;,&#39;lubridate&#39;,&#39;ggplot2&#39;,&#39;dplyr&#39;,&#39;tidytext&#39;,               &#39;stringr&#39;,&#39;tidyr&#39;,&#39;viridis&#39;,&#39;wordcloud&#39;, &quot;tm&quot;,&#39;forcats&#39;,&#39;fmsb&#39;,               &#39;scales&#39;,&#39;radarchart&#39;,&#39;qdap&#39;,&#39;knitr&#39;,&#39;geniusr&#39;,&#39;tidyverse&#39;) lapply(packages,require,character.only=T) rm(packages)</code> The package requieres a <code>Client ID</code> and a <code>Client Secret</code> to query the API. To do so, the user must have a premium account in order to create a developers account. The proccess could be done <a href="https://developer.spotify.com/dashboard/">here</a>. Once this process is done, you can pull spotify access token into R with <code>get_spotify_access_token()</code>. Note that you could pass your ID and secret in order to set your credentials into System Environment. For more information on the packages reference to Charlie Thompson’s <code>spotifyr</code> Github <a href="https://github.com/charlie86/spotifyr">repository</a>.</p>
+<p>```{r, eval=F} Sys.setenv(SPOTIFY_CLIENT_ID = ‘xxxxxxxxxxxxxxxxxxxxx’) Sys.setenv(SPOTIFY_CLIENT_SECRET = ‘xxxxxxxxxxxxxxxxxxxxx’)</p>
+<p>access_token &lt;- get_spotify_access_token()</p>
+<pre><code>
+To get Pearl Jam&#39;s songs audio features we use the function `get_artist_audio_features()`. This functions queries the Spotify API and returns information on several characteristics such as: danceability, energy, instrumentalness, valene, explicit content, track name, track album, etc. Now, I&#39;ll only keep songs featuring in the 11 albums. The reason is to eliminate live performances and covers and focus on self-written songs. Lastly we verify there are no repeated sing in the data set.
+
+```{r, eval=T}
+albums &lt;- c(&quot;Riot Act&quot;, &quot;Ten&quot;, &quot;Yield&quot;, &quot;Gigaton&quot;, &quot;Backspacer&quot;, &quot;Vs.&quot;, &quot;Pearl Jam&quot;, &quot;No Code&quot;, &quot;Vitalogy&quot;, &quot;Binaural&quot;, &quot;Lightning Bolt&quot;)
+pj &lt;- pj[pj$album_name %in% albums,]
+pj &lt;- mutate(pj, dupli=ifelse(duplicated(pj$track_name)==T,1,0))
+pj &lt;- subset(pj,dupli == 0)
+head(pj,5) %&gt;% select(track_name, album_name,artist_name,album_release_date,danceability,instrumentalness,energy,valence, key_name,mode_name) %&gt;%  kable(format = &quot;simple&quot;, col.names = str_to_title(gsub(&quot;[_]&quot;, &quot; &quot;, colnames(.))),align = &#39;lccccccccc&#39;,caption = &quot;An example table caption.&quot;,digits = 3)</code></pre>
+</div>
+<div id="lyrics-genius-api" class="section level2">
+<h2>Lyrics: Genius API</h2>
+<p>As for Spotify’s API, the Genius API requieres a developers account in order to query information. To authenticate the information the user must: 1. Create a <code>Genius API client</code> <a href="https://genius.com/api-clients/new">here</a>, 2. generate a <code>client access token</code> form the <a href="https://genius.com/api-clients">API Clients Page</a> and 3. set your credential in the System environment variable <code>GENIUS_API_TOKE</code> calling the function <code>genius_token()</code>. Now, in order to fecth the lyrics for each song I created a loop that goes trhough every song in the data set and retrieves the lyrics in a single vector and then adds it to the create variable <code>lyrics2</code>.</p>
+<p>```{r, eval = F} pj &lt;- mutate(pj, lyrics2 = &quot;&quot;) for (element in (1:nrow(pj))) {</p>
+<p># I created the loop with two cicles in it in order to double check all the songs # get their corresponding lyrics. Note that the loop isolates each song and # retrieves the information with the function et_lyrics_search()</p>
+<p>title &lt;- str_to_title(pj<span class="math inline">\(track_name[element])  print(title)  lyrics &lt;- get_lyrics_search(artist_name = &quot;Pearl Jam&quot;,  song_title = title)  if (nrow(lyrics)!=0) {  # I optedto reduce the dimensions of the retrieved data set to one observation.  # Now I save the first line and add the rest of the lines of the song  lyrics2 &lt;- &quot;&quot;  for (piece in (1:nrow(lyrics))) {  if (piece ==1) {  lyrics2 &lt;- lyrics\)</span>line[piece] } else{ lyrics2 &lt;- paste(lyrics2, lyrics$line[piece], collapse = &quot; &quot;) } print(title) print(lyrics2) } }</p>
+<p># If any song had any problem with querying the lyrics the second part of the loop # repeats the procces to guarantee that all songs are assinged to their lyrics.</p>
+<p>if (nrow(lyrics)==0) { lyrics &lt;- get_lyrics_search(artist_name = “Pearl Jam”, song_title = title) lyrics2 &lt;- &quot;&quot; for (piece in (1:nrow(lyrics))) { if (piece ==1) { lyrics2 &lt;- lyrics<span class="math inline">\(line[piece]  }  else{  lyrics2 &lt;- paste(lyrics2, lyrics\)</span>line[piece], collapse = &quot; &quot;) } print(title) print(lyrics2) } }</p>
+<p># Finally the song is added to the original data</p>
+<p>pj$lyrics2[element] &lt;- lyrics2 }</p>
+<pre><code>
+Our data set now contains lyrics to all the 146 songs in the 11 albums. A glimpse to my top two Pearl Jam songs (according to spotify rankings) Black and Even flow:
+
+``` {r, eval=T ,include=F} 
+pj &lt;- inner_join(pj,lyrics)
+colnames(pj)[ncol(pj)] &lt;- &#39;lyrics&#39;</code></pre>
+<pre class="{r}"><code>songs &lt;- c(&#39;Black&#39;, &#39;Even Flow&#39;)
+pj[pj$track_name %in% songs,] %&gt;% select(artist_name, album_name, track_name, lyrics) %&gt;% 
+  kable(format = &quot;simple&quot;,col.names = str_to_title(gsub(&quot;[_]&quot;, &quot; &quot;, colnames(.))),align = &#39;lccccccccc&#39;)</code></pre>
+<p>Finally, we have to take into account instumental songs. Even though Pearl Jam doesn’t have many instrumental songs 3 cases need to be adressed. these are <strong><em>Arc</em></strong>, <strong><em>Aya Davanita</em></strong> and <strong><em>Cready Stomp</em></strong>. I proced then to assing a missing value to these songs in order to implement the followong analysis. <code>{r, eval = T} songs &lt;- c(&quot;Arc&quot;,&quot;Aya Davanita - Remastered&quot;,&quot;Cready Stomp - bonus track&quot;) pj[pj$track_name %in% songs,grep(&#39;lyrics&#39;, colnames(pj))] pj[pj$track_name %in% songs,grep(&#39;lyrics&#39;, colnames(pj))] &lt;- NA</code></p>
+</div>
 </div>
 
 
